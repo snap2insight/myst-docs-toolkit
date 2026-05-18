@@ -1,0 +1,12 @@
+# Build artifacts (book-theme has its own .gitignore covering node_modules + builds)
+_build/
+node_modules/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

@@ -10,3 +10,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Python test caches
+__pycache__/
+.pytest_cache/
+*.pyc

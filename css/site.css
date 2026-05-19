@@ -191,14 +191,20 @@ html.dark, html[data-theme="dark"] {
 
 
 /* ---------- Font override ----------
- * Mermaid sets font-family directly on each text element of its SVG.
- * We force it (with !important) to use our CSS variable so the font
- * stays consistent regardless of what theme is active.
+ * Mermaid renders diagram labels two ways:
+ *   - as <text> elements (older themes / some node types)
+ *   - as <div>/<span> inside <foreignObject> (newer themes / wrapped text)
  *
- * If you don't want the handwritten look, redefine `--mermaid-font-family`
- * in your site CSS to override (e.g. "system-ui, -apple-system, sans-serif"). */
+ * Mermaid also injects a <style> block inside each SVG that sets
+ * font-family via an id selector. We win against that with !important
+ * on a broad descendant selector covering every `[class*="mermaid"]`
+ * container the plugin emits, plus the bare `.mermaid` class some
+ * MyST renderers use. */
 
-.mermaid text {
+.mermaid svg,
+.mermaid svg *,
+[class*="mermaid"] svg,
+[class*="mermaid"] svg * {
     font-family: var(--mermaid-font-family) !important;
 }
 

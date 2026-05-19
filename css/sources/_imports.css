@@ -1,0 +1,7 @@
+/* @import directives — composed into the very top of the built site.css.
+ *
+ * CSS spec requires @import to appear before any other rule (except
+ * @charset and @layer). Anything other than @import in this file will
+ * be stripped by the build script. */
+
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');

@@ -20,21 +20,54 @@ the bootstrap convention.
 
 ```
 myst-docs-toolkit/
-├── README.md                       — this file
-├── LICENSE                         — MIT
-├── .toolkit-version                — pins the upstream book-theme commit
+├── README.md                            — this file
+├── LICENSE                              — MIT
+├── .toolkit-version                     — pins the upstream book-theme commit
 ├── templates/
-│   └── book-theme/                 — submodule of myst-templates/book-theme
+│   └── book-theme/                      — submodule of myst-templates/book-theme
 ├── css/
-│   └── site.css                    — generic site styling (block kinds, button,
-│                                     footer, mermaid dual-theme toggling)
+│   ├── README.md                        — explains the build flow
+│   ├── site.css                         — GENERATED composed stylesheet
+│   └── sources/
+│       ├── _imports.css                 — @import statements (Google Fonts)
+│       └── _layout.css                  — block kinds, button, footer rules
 ├── parts/
-│   └── footer.md                   — generic default footer ("Built with MyST")
+│   └── footer.md                        — generic default footer
 ├── plugins/
-│   └── myst-mermaid/               — dual-theme mermaid rendering plugin
-└── bin/
-    └── sync.sh                     — vendor toolkit into a docs site (copy mode)
+│   └── myst-mermaid/                    — dual-theme mermaid plugin
+│       ├── plugin.py
+│       ├── css/mermaid.css              — canonical mermaid CSS (also composed)
+│       └── ...
+├── bin/
+│   ├── build-css.sh                     — compose css/site.css from sources
+│   └── sync.sh                          — vendor toolkit into a docs site
+└── docs/                                — toolkit's own docs site (Pages)
 ```
+
+## CSS composition
+
+`css/site.css` is a **generated** file. Edit one of the sources, then
+re-run the composer:
+
+```bash
+./bin/build-css.sh
+```
+
+The script reads:
+- `css/sources/_imports.css` — @import statements (bubbled to the top of
+  the output; CSS spec requires this).
+- `css/sources/_layout.css` — block-kind, button, footer rules.
+- `plugins/myst-mermaid/css/mermaid.css` — mermaid plugin CSS.
+
+…dedupes the @imports, and writes a banner + concatenated rules into
+`css/site.css`. Sources and generated output are both committed; CI can
+verify they're in sync with `git diff --exit-code css/site.css`
+after re-running the composer.
+
+This roundabout dance exists because MyST's `site.options.style` only
+accepts a single CSS path and doesn't serve CSS files referenced via
+runtime `@import`. Build-time composition gives us modular sources +
+a single deployable artifact.
 
 ## What's covered today
 

@@ -1,22 +1,16 @@
 /* myst-mermaid plugin — companion CSS.
  *
- * Loaded alongside (or instead of) the toolkit's css/site.css. Provides:
- *   - Architects Daughter font for diagram text
- *   - Light + dark color-palette CSS variables (for downstream overrides)
- *   - Visibility toggling for the .mermaid-light / .mermaid-dark variants
- *     produced by the plugin's dual_render mode
- *
- * To use, list this file in your site's shared-theme.yml style array:
+ * Standalone variant of the mermaid CSS that's also mirrored into the
+ * toolkit's css/site.css. Use this file directly in shared-theme.yml
+ * if you want the mermaid styling without the toolkit's generic block-
+ * kind / button / footer rules.
  *
  *   site:
  *     options:
- *       style:
- *         - _toolkit/css/site.css
- *         - _toolkit/plugins/myst-mermaid/css/mermaid.css
+ *       style: _toolkit/plugins/myst-mermaid/css/mermaid.css
  *
- * If you only want the mermaid CSS without the toolkit's generic
- * styling, list just this one.
- */
+ * @import MUST be at the top of any CSS file — browsers silently ignore
+ * @import statements that appear after other rules. */
 
 @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
 

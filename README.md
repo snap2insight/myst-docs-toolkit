@@ -21,13 +21,19 @@ the bootstrap convention.
 ```
 myst-docs-toolkit/
 ├── README.md                       — this file
+├── LICENSE                         — MIT
 ├── .toolkit-version                — pins the upstream book-theme commit
 ├── templates/
-│   └── book-theme/                 — vendored clone of myst-templates/book-theme
+│   └── book-theme/                 — submodule of myst-templates/book-theme
 ├── css/
-│   └── site.css                    — generic site styling (block kinds, button, footer)
-└── parts/
-    └── footer.md                   — generic default footer ("Built with MyST")
+│   └── site.css                    — generic site styling (block kinds, button,
+│                                     footer, mermaid dual-theme toggling)
+├── parts/
+│   └── footer.md                   — generic default footer ("Built with MyST")
+├── plugins/
+│   └── myst-mermaid/               — dual-theme mermaid rendering plugin
+└── bin/
+    └── sync.sh                     — vendor toolkit into a docs site (copy mode)
 ```
 
 ## What's covered today
@@ -35,11 +41,15 @@ myst-docs-toolkit/
 - **Template** — vendored `book-theme` upstream, pinned via
   `.toolkit-version`.
 - **CSS** — styling for the landing-page block kinds
-  (`.split-image`, `.justified`), the `{button}` role, and the footer
-  grid. No brand colors, fonts, or logos.
+  (`.split-image`, `.justified`), the `{button}` role, the footer grid,
+  and the mermaid dual-theme toggling classes. No brand colors, fonts,
+  or logos.
 - **Footer** — a minimal "Built with MyST" default. Sites that want
   branded footers reference their own (provided by the consuming
   organization, layered on top of the toolkit).
+- **Plugins** — see [`plugins/`](plugins/). Currently ships
+  [`myst-mermaid`](plugins/myst-mermaid/), a Python executable plugin
+  that pre-processes mermaid blocks for dual light/dark rendering.
 
 ## What will be added at split time
 

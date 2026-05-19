@@ -101,3 +101,28 @@ a.button:hover,
 .footer-grid a:hover {
     color: #000;
 }
+
+/* ---------- Mermaid dual-theme rendering ----------
+   Companion CSS for the `myst-mermaid` plugin. The plugin emits each
+   mermaid block twice, wrapped in `.mermaid-light` and `.mermaid-dark`
+   containers inside a `.mermaid-dual-container`. We show one and hide
+   the other based on the page's color scheme. */
+
+.mermaid-light { display: block; }
+.mermaid-dark  { display: none;  }
+
+/* book-theme exposes the active mode via a class on <html>. Support both
+   `html.dark` (newer) and `[data-theme="dark"]` (older / common). */
+html.dark              .mermaid-light,
+html[data-theme="dark"] .mermaid-light { display: none; }
+html.dark              .mermaid-dark,
+html[data-theme="dark"] .mermaid-dark  { display: block; }
+
+/* Fallback when the site theme doesn't explicitly set a mode and the
+   user's OS prefers dark — match that. Class-based overrides above win. */
+@media (prefers-color-scheme: dark) {
+    html:not(.dark):not([data-theme="light"]) .mermaid-light { display: none; }
+    html:not(.dark):not([data-theme="light"]) .mermaid-dark  { display: block; }
+}
+
+.mermaid-dual-container { margin: 1rem 0; }

@@ -1,0 +1,44 @@
+# myst-mermaid.example.yml — copy to your project root as `myst-mermaid.yml`
+# and edit to taste. All keys are optional; defaults apply when omitted.
+#
+# Every key is a Mermaid config key (see https://mermaid.js.org/config/),
+# EXCEPT for these two reserved plugin-level keys:
+
+# Plugin behavior
+dual_render: true              # emit light + dark variants; CSS hides the
+                               # variant that doesn't match the active theme.
+                               # Set to false for a single render per diagram.
+
+# Optional: point at a separate file with the bulk of the mermaid config.
+# Keys here override keys in that file.
+# config_file: mermaid-global-config.yml
+
+# ── Mermaid config below ────────────────────────────────────────────────
+
+# layout: elk | dagre
+layout: elk
+elk:
+  mergeEdges: true
+  # BRANDES_KOEPF | HIERARCHICAL | LINEAR_SEGMENTS | NETWORK_SIMPLEX
+  nodePlacementStrategy: NETWORK_SIMPLEX
+
+# theme: default | forest | dark | neutral | base
+# When dual_render is true, the "dark" variant always uses theme=dark
+# regardless of this setting — so set the light-mode theme here.
+theme: default
+
+fontFamily: "var(--mermaid-font-family)"
+themeVariables:
+  fontFamily: "var(--mermaid-font-family)"
+  fontSize: "var(--mermaid-font-size)"
+  # Define colors via CSS variables to keep them in sync with your site
+  # theme; the toolkit's site.css ships sensible defaults.
+
+# Reduce build-time noise: debug | info | warn | error | fatal
+logLevel: fatal
+
+# darkMode here doesn't drive the dark variant — that's done via theme:dark.
+darkMode: false
+
+# Wrap text in markdown nodes inside diagrams.
+markdownAutoWrap: true

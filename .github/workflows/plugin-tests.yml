@@ -72,8 +72,12 @@ jobs:
 
       - name: Smoke-test mmdc
         run: |
+          # Use the same puppeteer config the integration tests use
+          # (--no-sandbox is required on Ubuntu runners).
           echo "graph LR; A --> B" > /tmp/smoke.mmd
-          mmdc -i /tmp/smoke.mmd -o /tmp/smoke.svg --quiet
+          mmdc -i /tmp/smoke.mmd -o /tmp/smoke.svg \
+               -p plugins/myst-mermaid/tests/puppeteer-config.json \
+               --quiet
           test -s /tmp/smoke.svg && echo "✅ mmdc renders cleanly"
 
       - name: Run integration tests

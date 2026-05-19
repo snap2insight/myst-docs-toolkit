@@ -1,0 +1,15 @@
+# myst-mermaid plugin config for the toolkit's own docs site.
+# Picked up by ../plugins/myst-mermaid/plugin.py at build time.
+
+dual_render: true
+
+# Mermaid config below. See https://mermaid.js.org/config/
+theme: default
+fontFamily: "system-ui, -apple-system, sans-serif"
+themeVariables:
+  fontFamily: "system-ui, -apple-system, sans-serif"
+  fontSize: "14px"
+
+logLevel: fatal
+darkMode: false
+markdownAutoWrap: true

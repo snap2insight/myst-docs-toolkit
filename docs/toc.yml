@@ -1,0 +1,47 @@
+# Table of Contents for the myst-docs-toolkit docs site.
+# Imported into myst.yml via `extends:`.
+#
+# Reading flow:
+#   1. Landing            — what is this, raise curiosity
+#   2. README             — short intro / pointers
+#   3. Intro              — what it is, getting started, three-layer model
+#   4. Capabilities       — overview + per-capability deep dives
+#   5. Plugins            — per-plugin docs (with live examples)
+#   6. Design             — vendoring modes, version pinning, decisions
+#   7. Contributing       — how to help
+
+version: 1
+project:
+  toc:
+    - file: landing-page.md
+    - file: README.md
+
+    - title: "Intro"
+      children:
+        - file: intro/what-is-it.md
+        - file: intro/getting-started.md
+        - file: intro/three-layer-model.md
+
+    - title: "Capabilities"
+      children:
+        - file: capabilities/overview.md
+        - file: capabilities/templates.md
+        - file: capabilities/styling.md
+        - file: capabilities/parts.md
+        - file: capabilities/plugins.md
+
+    - title: "Plugins"
+      children:
+        - file: plugins/myst-mermaid.md
+
+    - title: "Design"
+      children:
+        - file: design/vendoring-modes.md
+        - file: design/version-pinning.md
+        - file: design/design-decisions.md
+
+    - title: "Contributing"
+      children:
+        - file: contributing/overview.md
+        - file: contributing/adding-plugins.md
+        - file: contributing/releases.md

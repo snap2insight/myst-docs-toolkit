@@ -1,0 +1,42 @@
+# myst-docs-toolkit — own docs site.
+# Deploys to GitHub Pages via .github/workflows/docs-deploy.yml.
+version: 1
+extends:
+  - toc.yml
+  - shared-theme.yml
+
+project:
+  id: myst-docs-toolkit-docs
+  title: "MyST Docs Toolkit"
+  description: "Composable docs infrastructure for MyST — templates, CSS overlay, parts, and plugins."
+  authors:
+    - name: myst-docs-toolkit contributors
+  license: MIT
+  keywords:
+    - myst
+    - mystmd
+    - book-theme
+    - mermaid
+    - documentation
+    - static site
+  date: 2026-05-18
+  # The plugin lives inside the same repo at ../plugins/myst-mermaid/.
+  # Dogfooded on the plugin's own docs page (plugins/myst-mermaid.md).
+  plugins:
+    - type: executable
+      path: ../plugins/myst-mermaid/plugin.py
+  exclude:
+    - "_build/**"
+    - "**/node_modules/**"
+    - "**/*.template.md"
+  numbering:
+    headings: true
+    figure:
+      enabled: true
+    table:
+      enabled: true
+
+site:
+  options:
+    logo_text: "MyST Docs Toolkit"
+    hover_xref: true

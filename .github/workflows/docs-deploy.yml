@@ -1,0 +1,85 @@
+# Builds the docs/ site and publishes it to GitHub Pages.
+#
+# This is the toolkit's own docs site (dogfooded — uses ../templates,
+# ../css, ../parts, and the ../plugins/myst-mermaid plugin).
+
+name: Docs — Build & Deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "css/**"
+      - "parts/**"
+      - "plugins/**"
+      - "templates/**"
+      - ".toolkit-version"
+      - ".github/workflows/docs-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # Opt JS actions into Node 24 (configure-pages@v5 still declares Node 20).
+  # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    name: Build docs site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true            # fetch book-theme submodule
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install MyST
+        run: npm install -g mystmd
+
+      - name: Install Python deps (for myst-mermaid plugin)
+        run: pip install pyyaml jsonschema
+
+      - name: Build with MyST
+        working-directory: docs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Derive BASE_URL from the actual Pages serving URL.
+          PAGES_URL=$(gh api repos/${{ github.repository }}/pages --jq '.html_url' 2>/dev/null || echo "")
+          BASE_PATH=$(printf '%s' "$PAGES_URL" | sed -E 's|^https?://[^/]+||;s|/$||')
+          echo "Pages URL: $PAGES_URL"
+          echo "BASE_URL:  $BASE_PATH"
+          BASE_URL="$BASE_PATH" myst build --html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: "docs/_build/html"
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: ${{ always() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

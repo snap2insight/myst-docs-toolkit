@@ -1,0 +1,16 @@
+# Shared theme config for the toolkit's own docs site.
+#
+# This docs site lives INSIDE the toolkit repo, so it references the
+# toolkit's assets directly via relative paths (`../templates`, `../css`,
+# `../parts`) rather than the `_toolkit/` symlink pattern that consuming
+# repos use. This is intentional — it dogfoods the toolkit at every build.
+version: 1
+site:
+  template: ../templates/book-theme
+  options:
+    logo: site-assets/images/logo-placeholder.svg
+    favicon: site-assets/images/favicon-placeholder.svg
+    style: ../css/site.css
+    hide_authors: true
+  parts:
+    footer: ../parts/footer.md

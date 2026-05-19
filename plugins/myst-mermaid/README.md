@@ -95,12 +95,36 @@ the container so cross-references still resolve.
 For `dual_render: false`, you just get one mermaid block with the merged
 config applied.
 
+## CSS
+
+Dual-render visibility, the Architects Daughter font import, light/dark
+color-palette CSS variables, and a `.mermaid text` font override live at
+[`css/mermaid.css`](css/mermaid.css). This file is **also mirrored into
+the toolkit's `css/site.css`**, so consumers who use the toolkit's
+generic stylesheet get the mermaid styling for free.
+
+If your site only wants the mermaid plugin's CSS (without the toolkit's
+generic block-kind / button / footer rules), point your
+`shared-theme.yml` at this file instead of `css/site.css`:
+
+```yaml
+site:
+  options:
+    style: _toolkit/plugins/myst-mermaid/css/mermaid.css
+```
+
+The dual mirroring exists because MyST's `site.options.style` only
+accepts a single CSS path — a future change can replace this with an
+array reference if MyST gains support.
+
 ## Files
 
 ```
 myst-mermaid/
 ├── plugin.py                          — the plugin (single Python file)
 ├── mermaid.schema.json                — cached Mermaid config schema
+├── css/
+│   └── mermaid.css                    — companion CSS (also in toolkit's site.css)
 ├── examples/
 │   └── myst-mermaid.example.yml       — starter config to copy
 └── README.md                          — this file

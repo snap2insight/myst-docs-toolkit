@@ -1,0 +1,86 @@
+/* myst-mermaid plugin — companion CSS.
+ *
+ * Loaded alongside (or instead of) the toolkit's css/site.css. Provides:
+ *   - Architects Daughter font for diagram text
+ *   - Light + dark color-palette CSS variables (for downstream overrides)
+ *   - Visibility toggling for the .mermaid-light / .mermaid-dark variants
+ *     produced by the plugin's dual_render mode
+ *
+ * To use, list this file in your site's shared-theme.yml style array:
+ *
+ *   site:
+ *     options:
+ *       style:
+ *         - _toolkit/css/site.css
+ *         - _toolkit/plugins/myst-mermaid/css/mermaid.css
+ *
+ * If you only want the mermaid CSS without the toolkit's generic
+ * styling, list just this one.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+
+/* ---------- Dual-render visibility toggling ----------
+ * The plugin emits each diagram twice (.mermaid-light + .mermaid-dark
+ * inside a .mermaid-dual-container). Show whichever matches the active
+ * color scheme. Supports book-theme's `html.dark`, the older
+ * `[data-theme="dark"]`, and the OS prefers-color-scheme fallback. */
+
+.mermaid-light { display: block; }
+.mermaid-dark  { display: none;  }
+
+html.dark                .mermaid-light,
+html[data-theme="dark"]  .mermaid-light { display: none; }
+html.dark                .mermaid-dark,
+html[data-theme="dark"]  .mermaid-dark  { display: block; }
+
+@media (prefers-color-scheme: dark) {
+    html:not(.dark):not([data-theme="light"]) .mermaid-light { display: none; }
+    html:not(.dark):not([data-theme="light"]) .mermaid-dark  { display: block; }
+}
+
+.mermaid-dual-container { margin: 1rem 0; }
+
+
+/* ---------- Theme variables ----------
+ * Mermaid bakes colors into the rendered SVG at draw time (configured via
+ * `themeVariables` in your `myst-mermaid.yml`), so these CSS variables
+ * mostly serve downstream overrides — e.g. custom rules that style
+ * mermaid edges or labels after render. The font variables ARE picked up
+ * by the `.mermaid text` rule below. */
+
+:root {
+    --mermaid-font-family: 'Architects Daughter', cursive;
+    --mermaid-font-size: 14px;
+
+    /* Light Mode Palette */
+    --mermaid-primary-color:  #ECECFF;
+    --mermaid-primary-text:   #333;
+    --mermaid-primary-border: #9370DB;
+    --mermaid-line-color:     #333;
+    --mermaid-secondary-color:#ffffde;
+    --mermaid-tertiary-color: #fff;
+}
+
+html.dark, html[data-theme="dark"] {
+    /* Dark Mode Palette */
+    --mermaid-primary-color:  #2D2D2D;
+    --mermaid-primary-text:   #F0F0F0;
+    --mermaid-primary-border: #BB86FC;
+    --mermaid-line-color:     #E0E0E0;
+    --mermaid-secondary-color:#383838;
+    --mermaid-tertiary-color: #121212;
+}
+
+
+/* ---------- Font override ----------
+ * Mermaid sets font-family directly on each text element of its SVG.
+ * We force it (with !important) to use our CSS variable so the font
+ * stays consistent regardless of what theme is active.
+ *
+ * If you don't want the handwritten look, redefine `--mermaid-font-family`
+ * in your site CSS to override (e.g. "system-ui, -apple-system, sans-serif"). */
+
+.mermaid text {
+    font-family: var(--mermaid-font-family) !important;
+}

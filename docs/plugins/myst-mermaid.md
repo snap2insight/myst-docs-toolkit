@@ -132,8 +132,30 @@ merged config applied. No container wrapping; no CSS toggling needed.
   `prefers-color-scheme: dark` to detect mode. If your theme uses a
   different mechanism, layer additional rules over the toolkit CSS.
 
+## Styling and fonts
+
+The plugin's companion CSS lives at
+[`plugins/myst-mermaid/css/mermaid.css`](https://github.com/snap2insight/myst-docs-toolkit/blob/main/plugins/myst-mermaid/css/mermaid.css).
+It ships:
+
+- A Google Fonts import for **Architects Daughter** (handwritten look).
+  Forced onto mermaid text via `.mermaid text { font-family: ... !important; }`.
+- CSS variables exposing a professional light + dark color palette
+  (purple accents, low-glare grays). Available for downstream overrides.
+- The `.mermaid-light` / `.mermaid-dark` visibility-toggle rules.
+
+This CSS is also mirrored into the toolkit's `css/site.css` so
+consumers who load the toolkit's main stylesheet get the mermaid
+styling automatically. If you want only the plugin's CSS without the
+rest of the toolkit, point `shared-theme.yml` at
+`_toolkit/plugins/myst-mermaid/css/mermaid.css` instead.
+
+To change the font: redefine `--mermaid-font-family` in your own CSS
+layered after the toolkit's.
+
 ## Related
 
 - Plugin source: [`plugins/myst-mermaid/plugin.py`](https://github.com/snap2insight/myst-docs-toolkit/blob/main/plugins/myst-mermaid/plugin.py)
+- Companion CSS: [`plugins/myst-mermaid/css/mermaid.css`](https://github.com/snap2insight/myst-docs-toolkit/blob/main/plugins/myst-mermaid/css/mermaid.css)
 - Example config: [`plugins/myst-mermaid/examples/myst-mermaid.example.yml`](https://github.com/snap2insight/myst-docs-toolkit/blob/main/plugins/myst-mermaid/examples/myst-mermaid.example.yml)
 - Mermaid config reference: [mermaid.js.org/config](https://mermaid.js.org/config/)

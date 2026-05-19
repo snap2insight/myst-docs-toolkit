@@ -57,24 +57,39 @@ pill with a hover state:
 A simple `.footer-grid` class for the rendered footer part — minimal
 padding, light separator, dimmed text.
 
-### Mermaid dual-theme toggling
+### Mermaid styling
 
 When the [`myst-mermaid`](../plugins/myst-mermaid.md) plugin is enabled,
-each mermaid diagram is emitted twice (once per theme). The CSS hides
-the variant that doesn't match the active color scheme:
+the toolkit's CSS provides everything the plugin's rendered output
+needs:
 
-```css
-.mermaid-light { display: block; }
-.mermaid-dark  { display: none;  }
+- **Dual-render visibility toggling.** Each diagram is emitted twice
+  (`.mermaid-light` + `.mermaid-dark`); the CSS hides whichever doesn't
+  match the active color scheme. Supports `html.dark`,
+  `[data-theme="dark"]`, and the `prefers-color-scheme: dark` media
+  query.
+- **A handwritten font** (Architects Daughter, imported from Google
+  Fonts) applied to mermaid text via `.mermaid text { font-family: ... }`.
+  Gives diagrams a sketched-on-a-whiteboard feel that reads as
+  intentional rather than auto-generated.
+- **A light + dark color palette** exposed as CSS variables
+  (`--mermaid-primary-color`, `--mermaid-primary-text`,
+  `--mermaid-primary-border`, etc.) — available for any custom rules
+  you write on top of the toolkit.
 
-html.dark .mermaid-light { display: none; }
-html.dark .mermaid-dark  { display: block; }
+The same CSS lives in two places — the toolkit's `css/site.css`
+(loaded by anyone using the toolkit) and the plugin's own
+`plugins/myst-mermaid/css/mermaid.css` (for sites that want only the
+mermaid CSS, no toolkit-wide styling). Pick one and reference it from
+`shared-theme.yml`.
 
-/* Plus a prefers-color-scheme fallback for sites that don't set html.dark */
-```
+To change the font: redefine `--mermaid-font-family` in your own CSS
+loaded after the toolkit's, e.g. `:root { --mermaid-font-family:
+system-ui, -apple-system, sans-serif; }`.
 
-If you don't use the plugin, these rules are no-ops (no `.mermaid-light`
-/ `.mermaid-dark` elements are emitted).
+If you don't use the plugin, the mermaid rules are no-ops (no
+`.mermaid-*` elements exist) — no overhead beyond the font import,
+which is deferred via `display=swap`.
 
 ## What it does *not* style
 

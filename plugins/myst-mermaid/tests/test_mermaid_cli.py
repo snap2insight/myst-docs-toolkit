@@ -62,30 +62,40 @@ def extract_mermaid_body(transformed_root: dict, variant: str) -> str:
     raise AssertionError(f"variant {variant} not found")
 
 
+PUPPETEER_CONFIG = Path(__file__).parent / "puppeteer-config.json"
+
+
 def render_with_mmdc(mermaid_body: str, out_dir: Path, name: str) -> Path:
     """Run mmdc to render the body to SVG. Returns the SVG path.
 
-    If mmdc fails because puppeteer can't find a Chrome binary (very common
-    in local environments), the test is skipped rather than failed — we
-    can't validate mermaid output without a renderer. Genuine mermaid
-    config errors still surface as failures.
+    Always passes -p puppeteer-config.json so Chrome can launch on Linux
+    CI runners (--no-sandbox + friends).
+
+    Skips (rather than fails) when Chrome can't be located or can't
+    launch — those are environment problems, not plugin bugs. Genuine
+    mermaid config errors still raise as failures.
     """
     in_path = out_dir / f"{name}.mmd"
     out_path = out_dir / f"{name}.svg"
     in_path.write_text(mermaid_body)
 
     proc = subprocess.run(
-        ["mmdc", "-i", str(in_path), "-o", str(out_path), "--quiet"],
+        ["mmdc", "-i", str(in_path), "-o", str(out_path),
+         "-p", str(PUPPETEER_CONFIG), "--quiet"],
         capture_output=True,
         text=True,
     )
     if proc.returncode != 0:
         combined = proc.stdout + proc.stderr
-        if "Could not find Chrome" in combined or "puppeteer browsers install" in combined:
+        chrome_signals = (
+            "Could not find Chrome",
+            "puppeteer browsers install",
+            "Failed to launch the browser process",
+        )
+        if any(sig in combined for sig in chrome_signals):
             pytest.skip(
-                "mmdc can't find a compatible Chrome. "
-                "Install with: `npx puppeteer browsers install chrome-headless-shell`. "
-                "CI workflows install this explicitly."
+                "mmdc can't launch Chrome on this host. "
+                f"stderr: {proc.stderr[:300]}"
             )
         raise RuntimeError(
             f"mmdc failed (exit {proc.returncode}):\n"

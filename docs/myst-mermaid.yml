@@ -4,7 +4,7 @@
 dual_render: true
 
 # Mermaid config below. See https://mermaid.js.org/config/
-theme: default
+theme: neutral
 fontFamily: "system-ui, -apple-system, sans-serif"
 themeVariables:
   fontFamily: "system-ui, -apple-system, sans-serif"

@@ -8,6 +8,7 @@ that consuming docs sites can opt into via their `myst.yml`.
 | Plugin | What it does |
 |---|---|
 | [`myst-mermaid/`](myst-mermaid/) | Dual-theme rendering for Mermaid diagrams — emits light + dark variants per block; companion CSS in `css/site.css` toggles visibility based on the page's color scheme. |
+| [`myst-figure-viewer/`](myst-figure-viewer/) | Interactive zoom, pan, and fullscreen for figures and Mermaid diagrams — delivered as a zero-dependency ESM widget via MyST's `{anywidget}` directive. |
 
 ## How a docs site enables a plugin
 

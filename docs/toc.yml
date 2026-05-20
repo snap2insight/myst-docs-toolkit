@@ -33,6 +33,7 @@ project:
     - title: "Plugins"
       children:
         - file: plugins/myst-mermaid.md
+        - file: plugins/myst-figure-viewer.md
 
     - title: "Design"
       children:

@@ -30,7 +30,7 @@ project:
     - "**/node_modules/**"
     - "**/*.template.md"
   numbering:
-    headings: true
+    headings: false
     figure:
       enabled: true
     table:

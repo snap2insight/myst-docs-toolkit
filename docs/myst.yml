@@ -7,6 +7,7 @@ extends:
 
 project:
   id: myst-docs-toolkit-docs
+  github: https://github.com/snap2insight/myst-docs-toolkit
   title: "MyST Docs Toolkit"
   description: "Composable docs infrastructure for MyST — templates, CSS overlay, parts, and plugins."
   authors:

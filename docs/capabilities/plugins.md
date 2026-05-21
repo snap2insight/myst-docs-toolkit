@@ -11,13 +11,16 @@ relevant) configuration schema.
 
 ## Current plugins
 
-| Plugin | What it does | Type |
+| Plugin | What it does | Delivery |
 |---|---|---|
-| [`myst-mermaid`](../plugins/myst-mermaid.md) | Pre-processes mermaid blocks into light + dark variants so diagrams render correctly in both themes. | Executable (Python) |
+| [`myst-mermaid`](../plugins/myst-mermaid.md) | Pre-processes mermaid blocks into light + dark variants so diagrams render correctly in both themes. | Executable plugin (Python) via `project.plugins` |
+| [`myst-figure-viewer`](../plugins/myst-figure-viewer.md) | Adds an interactive zoom / pan / fullscreen overlay to mermaid diagrams, `<figure>` blocks, and standalone images. | Runtime JS via `{anywidget}` directive in `parts/footer.md` |
 
 ## How a site enables a plugin
 
-In `myst.yml`:
+There are two enablement paths depending on the plugin's delivery model.
+
+**Executable / JavaScript plugins** — listed in `project.plugins` of `myst.yml`:
 
 ```yaml
 project:
@@ -26,23 +29,44 @@ project:
       path: _toolkit/plugins/myst-mermaid/plugin.py
 ```
 
-The plugin file lives inside the vendored `_toolkit/` directory, so
-contributors don't have to install anything extra to use it — beyond
-the plugin's own runtime dependencies, documented on its page.
+The plugin runs at *build time* and transforms the AST. `myst-mermaid`
+uses this path.
+
+**Runtime widget plugins** — embedded via the `{anywidget}` directive
+in a parts file (typically `parts/footer.md` for site-wide effect):
+
+````markdown
+```{anywidget} _toolkit/plugins/myst-figure-viewer/viewer.esm.js
+```
+````
+
+The plugin runs at *page-load time* as a JS module the browser executes.
+`myst-figure-viewer` uses this path because the features it adds
+(modal, drag-to-pan, zoom) need to react to user input — they can't be
+baked into a static AST transform.
+
+Both styles live alongside each other in `_toolkit/plugins/` and are
+inspectable as plain source.
 
 ## Plugin types
 
-MyST supports two kinds of plugin:
+MyST supports several plugin shapes:
 
-- **JavaScript plugins** — for transforms, directives, and roles. Load
-  via `type: javascript, path: ...`.
-- **Executable plugins** — for plugins written in any language that can
-  read JSON from stdin and write JSON to stdout. Load via
-  `type: executable, path: ...`. This is what the toolkit's current
-  plugin uses (Python).
+- **Executable plugins** — written in any language that can read JSON
+  from stdin and write JSON to stdout. Load via
+  `type: executable, path: ...`. `myst-mermaid` uses this.
+- **JavaScript plugins** — TypeScript / JS modules registered for
+  build-time transforms, directives, and roles. Load via
+  `type: javascript, path: ...`.
+- **Runtime widgets via `{anywidget}`** — ESM JS modules that execute
+  in the browser. Loaded by MyST's anywidget integration; book-theme
+  mounts each widget instance inside a shadow-DOM container.
+  `myst-figure-viewer` uses this.
 
 See the [MyST plugin docs](https://mystmd.org/guide/external-plugins) for
-the protocol details.
+the build-time protocol details, and
+[`myst-figure-viewer`](../plugins/myst-figure-viewer.md) for the runtime
+pattern.
 
 ## Why ship plugins separately rather than baking into the template
 

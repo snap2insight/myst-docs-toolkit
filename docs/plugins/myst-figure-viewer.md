@@ -136,7 +136,9 @@ and `prefers-color-scheme: dark`.
 
 - **Per-page delivery.** Each page needs the `{anywidget}` directive.
   Placing it in `parts/footer` is the recommended workaround.
-- **Mouse-only pan.** Touch events (mobile drag, pinch-to-zoom) are
-  not yet implemented.
+- **No pinch-to-zoom.** Single-finger drag-to-pan works on mobile
+  (touch events are wired up). Pinch-to-zoom isn't yet implemented;
+  on touch devices you can still zoom via the toolbar's `+` / `−` /
+  `⊙` buttons.
 - **No export.** The viewer doesn't offer download/copy-to-clipboard
   for diagrams (planned).

@@ -220,7 +220,10 @@ function openFullscreen(source) {
     zoomBy(e.deltaY < 0 ? 1.1 : 0.9);
   }, { passive: false });
 
-  // Drag-to-pan (mouse)
+  // Drag-to-pan (mouse). Mousedown is on the canvas, but mousemove and
+  // mouseup go on window so the drag continues even when the cursor
+  // leaves the canvas. We keep the handlers in scoped vars so they can
+  // be removed when the dialog closes (see the `close` handler below).
   let dragging = false, startX = 0, startY = 0;
   canvas.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return;
@@ -229,18 +232,20 @@ function openFullscreen(source) {
     startY = e.clientY - state.ty;
     canvas.classList.add('mfv-dragging');
   });
-  window.addEventListener('mousemove', (e) => {
+  const onMouseMove = (e) => {
     if (!dragging) return;
     state.tx = e.clientX - startX;
     state.ty = e.clientY - startY;
     apply(false);
-  });
-  window.addEventListener('mouseup', () => {
+  };
+  const onMouseUp = () => {
     if (dragging) {
       dragging = false;
       canvas.classList.remove('mfv-dragging');
     }
-  });
+  };
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
 
   // Touch drag-to-pan (mobile)
   canvas.addEventListener('touchstart', (e) => {
@@ -264,8 +269,12 @@ function openFullscreen(source) {
     }
   });
 
-  // Cleanup when the dialog closes
+  // Cleanup when the dialog closes — remove the dialog from the DOM and
+  // detach the window-level mouse handlers so they don't accumulate across
+  // open/close cycles.
   dialog.addEventListener('close', () => {
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseUp);
     dialog.remove();
   });
 

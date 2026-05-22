@@ -1,12 +1,14 @@
 # Plugin tests — runs on every push and PR.
 #
-# Two layers:
+# Two layers (both invoked via `just test`):
 #   1. Python unit tests for plugins/myst-mermaid/plugin.py
 #      (verifies AST transform shape, config merging, dual-render, etc.)
 #   2. mermaid-cli integration tests that feed the plugin's output
 #      through @mermaid-js/mermaid-cli (mmdc) and assert the rendered
 #      SVG is valid. Catches the case where the plugin emits a config
 #      mermaid.js itself rejects.
+#
+# Same `just` commands run locally — see Justfile in the repo root.
 
 name: Plugin tests
 
@@ -14,10 +16,14 @@ on:
   push:
     paths:
       - "plugins/**"
+      - "Justfile"
+      - "requirements.txt"
       - ".github/workflows/plugin-tests.yml"
   pull_request:
     paths:
       - "plugins/**"
+      - "Justfile"
+      - "requirements.txt"
       - ".github/workflows/plugin-tests.yml"
   workflow_dispatch:
 
@@ -38,11 +44,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install plugin runtime + test deps
-        run: pip install pyyaml jsonschema pytest
+      - uses: astral-sh/setup-uv@v6
+      - uses: extractions/setup-just@v3
 
-      - name: Run unit tests
-        run: pytest plugins/myst-mermaid/tests/test_plugin.py -v
+      - name: Run unit tests (just test-python)
+        run: just test-python
 
   mermaid-cli-integration:
     name: mermaid-cli SVG render
@@ -58,27 +64,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install mermaid-cli + matching Chrome
+      - uses: astral-sh/setup-uv@v6
+      - uses: extractions/setup-just@v3
+
+      - name: Run integration tests (just test-mmdc + smoke)
         run: |
-          npm install -g @mermaid-js/mermaid-cli
-          # mmdc uses puppeteer-core, which expects a specific Chrome
-          # version. Resolve and install that version from inside the
-          # installed package so it matches.
-          MMDC_DIR="$(npm root -g)/@mermaid-js/mermaid-cli"
-          (cd "$MMDC_DIR" && npx --yes puppeteer browsers install chrome-headless-shell)
-
-      - name: Install Python deps
-        run: pip install pyyaml jsonschema pytest
-
-      - name: Smoke-test mmdc
-        run: |
-          # Use the same puppeteer config the integration tests use
-          # (--no-sandbox is required on Ubuntu runners).
-          echo "graph LR; A --> B" > /tmp/smoke.mmd
-          mmdc -i /tmp/smoke.mmd -o /tmp/smoke.svg \
-               -p plugins/myst-mermaid/tests/puppeteer-config.json \
-               --quiet
-          test -s /tmp/smoke.svg && echo "✅ mmdc renders cleanly"
-
-      - name: Run integration tests
-        run: pytest plugins/myst-mermaid/tests/test_mermaid_cli.py -v
+          just test-mmdc-smoke
+          just test-mmdc

@@ -1,0 +1,12 @@
+# Python deps for the toolkit's plugins, tests, and bin/ scripts.
+# Installed into .venv/ by `just setup` (uv-managed).
+
+# myst-mermaid plugin runtime
+pyyaml
+jsonschema
+
+# bin/update-dates.py (uses only stdlib + git; no extra deps)
+# (intentionally empty — listed here for discoverability)
+
+# Plugin tests
+pytest

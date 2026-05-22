@@ -11,7 +11,8 @@ Thumbs.db
 .idea/
 *.swp
 
-# Python test caches
+# Python venv (uv-managed via `just venv`) + test caches
+.venv/
 __pycache__/
 .pytest_cache/
 *.pyc

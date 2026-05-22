@@ -44,13 +44,53 @@ myst-docs-toolkit/
 └── docs/                                — toolkit's own docs site (Pages)
 ```
 
+## Local development
+
+This repo uses [`just`](https://github.com/casey/just) as the task
+runner and [`uv`](https://docs.astral.sh/uv/) for Python deps. Same
+recipes run locally and in CI — no drift between "works on my
+machine" and "works in GH Actions".
+
+```bash
+# One-time setup (after `git clone` + submodule init)
+just setup                # creates .venv via uv; installs mystmd globally
+
+# Build the dogfood docs site
+just docs                 # → docs/_build/html/
+
+# Live dev server with hot reload
+just docs-dev             # → http://localhost:3000
+
+# Static preview matching what GH Pages serves (NOT the same as docs-dev)
+just docs-preview         # → http://localhost:8000
+
+# Run the plugin test suite
+just test                 # Python unit + mermaid-cli SVG render
+
+# Update last-updated dates in docs frontmatter from git history
+just update-dates
+
+# Recompose css/site.css from sources
+just build-css
+
+# Vendor toolkit assets into a downstream docs site
+just sync ../enterprise-knowledge-architecture
+```
+
+Run `just` (no args) to list every recipe. The CI workflows
+([`docs-deploy.yml`](.github/workflows/docs-deploy.yml) and
+[`plugin-tests.yml`](.github/workflows/plugin-tests.yml)) are thin
+wrappers that call `just ci-docs` and `just ci-test` — the actual
+build logic lives in the [`Justfile`](Justfile).
+
 ## CSS composition
 
 `css/site.css` is a **generated** file. Edit one of the sources, then
 re-run the composer:
 
 ```bash
-./bin/build-css.sh
+just build-css
+# equivalent to: ./bin/build-css.sh
 ```
 
 The script reads:

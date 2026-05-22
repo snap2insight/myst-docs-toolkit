@@ -2,6 +2,9 @@
 #
 # This is the toolkit's own docs site (dogfooded — uses ../templates,
 # ../css, ../parts, and the ../plugins/myst-mermaid plugin).
+#
+# All build logic lives in the root Justfile (recipe: `ci-docs`).
+# Same command runs locally and in CI — keeps dev/CI parity.
 
 name: Docs — Build & Deploy Pages
 
@@ -14,6 +17,9 @@ on:
       - "parts/**"
       - "plugins/**"
       - "templates/**"
+      - "bin/**"
+      - "Justfile"
+      - "requirements.txt"
       - ".toolkit-version"
       - ".github/workflows/docs-deploy.yml"
   workflow_dispatch:
@@ -40,6 +46,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           submodules: true            # fetch book-theme submodule
+          fetch-depth: 0              # update-dates.py needs full history
 
       - uses: actions/setup-node@v5
         with:
@@ -49,23 +56,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install MyST
-        run: npm install -g mystmd
+      - uses: astral-sh/setup-uv@v6
+      - uses: extractions/setup-just@v3
 
-      - name: Install Python deps (for myst-mermaid plugin)
-        run: pip install pyyaml jsonschema
+      - name: Install build deps
+        run: just node-deps python-deps
 
-      - name: Build with MyST
-        working-directory: docs
+      - name: Resolve BASE_URL from the Pages serving URL
+        id: base
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Derive BASE_URL from the actual Pages serving URL.
+          # Public Pages → https://<org>.github.io/<repo>/  → BASE_URL=/<repo>
+          # Private Pages → https://<random>.pages.github.io/ → BASE_URL=""
           PAGES_URL=$(gh api repos/${{ github.repository }}/pages --jq '.html_url' 2>/dev/null || echo "")
           BASE_PATH=$(printf '%s' "$PAGES_URL" | sed -E 's|^https?://[^/]+||;s|/$||')
           echo "Pages URL: $PAGES_URL"
           echo "BASE_URL:  $BASE_PATH"
-          BASE_URL="$BASE_PATH" myst build --html
+          echo "BASE_URL=$BASE_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Build (just ci-docs)
+        env:
+          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
+        run: just ci-docs
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v5

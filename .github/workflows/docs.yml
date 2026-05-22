@@ -6,7 +6,7 @@
 # All build logic lives in the root Justfile (recipe: `ci-docs`).
 # Same command runs locally and in CI — keeps dev/CI parity.
 
-name: Docs — Build & Deploy Pages
+name: Docs
 
 on:
   push:
@@ -21,7 +21,7 @@ on:
       - "Justfile"
       - "requirements.txt"
       - ".toolkit-version"
-      - ".github/workflows/docs-deploy.yml"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:

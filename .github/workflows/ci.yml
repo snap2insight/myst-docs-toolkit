@@ -10,7 +10,7 @@
 #
 # Same `just` commands run locally — see Justfile in the repo root.
 
-name: Plugin tests
+name: CI
 
 on:
   push:
@@ -18,13 +18,13 @@ on:
       - "plugins/**"
       - "Justfile"
       - "requirements.txt"
-      - ".github/workflows/plugin-tests.yml"
+      - ".github/workflows/ci.yml"
   pull_request:
     paths:
       - "plugins/**"
       - "Justfile"
       - "requirements.txt"
-      - ".github/workflows/plugin-tests.yml"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 permissions:

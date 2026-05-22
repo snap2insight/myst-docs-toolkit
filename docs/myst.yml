@@ -26,6 +26,9 @@ project:
   plugins:
     - type: executable
       path: ../plugins/myst-mermaid/plugin.py
+    - https://github.com/choldgraf/myst-substitutions/releases/download/v0.1/index.mjs
+  substitutions:
+    date: "2026-05-18"
   exclude:
     - "_build/**"
     - "**/node_modules/**"

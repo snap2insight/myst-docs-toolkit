@@ -1,4 +1,11 @@
+---
+substitutions:
+  date: "2026-05-18"
+---
 # myst-docs-toolkit
+
+> _Last updated: {{ date }}_ &nbsp;·&nbsp; site auto-updates via `just update-dates`
+> running on every CI build.
 
 Composable docs infrastructure for [MyST](https://mystmd.org): a pinned
 book-theme template, opinionated CSS, parts, and plugins that several

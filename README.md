@@ -77,11 +77,15 @@ just build-css
 just sync ../enterprise-knowledge-architecture
 ```
 
-Run `just` (no args) to list every recipe. The CI workflows
-([`docs-deploy.yml`](.github/workflows/docs-deploy.yml) and
-[`plugin-tests.yml`](.github/workflows/plugin-tests.yml)) are thin
-wrappers that call `just ci-docs` and `just ci-test` — the actual
-build logic lives in the [`Justfile`](Justfile).
+Run `just` (no args) to list every recipe. The CI workflows are thin
+wrappers that call `just` recipes — the actual build logic lives in
+the [`Justfile`](Justfile):
+
+| Workflow | Recipe | Triggers |
+|----------|--------|----------|
+| [`ci.yml`](.github/workflows/ci.yml) | `just test-python` + `just test-mmdc` | push / PR touching `plugins/**` |
+| [`docs.yml`](.github/workflows/docs.yml) | `just ci-docs` | push to `main` touching `docs/`, `css/`, `plugins/`, etc. |
+| [`release.yml`](.github/workflows/release.yml) | `gh release create --generate-notes` | tag `v*` pushed, or manual dispatch |
 
 ## CSS composition
 

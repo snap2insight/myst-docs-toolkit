@@ -34,7 +34,20 @@ it's a MAJOR bump.
    git tag -a v1.2.0 -m "v1.2.0 — add header part, bump book-theme to 1.5"
    git push origin v1.2.0
    ```
-4. Create a GitHub release from the tag with the highlights.
+4. **The [`release.yml`](https://github.com/snap2insight/myst-docs-toolkit/blob/main/.github/workflows/release.yml)
+   workflow fires automatically on the `v*` tag push** — it creates a
+   GitHub Release for the tag and auto-generates release notes from
+   the commit history since the previous tag (`gh release create
+   --generate-notes`). Idempotent: re-running on the same tag (e.g.
+   via `workflow_dispatch`) is a no-op.
+
+If you need to publish a release without a tag push (e.g. you tagged
+locally weeks ago and want to retroactively cut the release), run
+the workflow manually:
+
+```bash
+gh workflow run release.yml -f tag=v1.2.0
+```
 
 Consumers can now pin to `TOOLKIT_REF=v1.2.0` in their deploy workflows.
 

@@ -16,6 +16,11 @@ be useful beyond any single organization.
 - **New plugin or substantial feature:** open an issue first to discuss
   scope — saves a round of rework.
 
+Read [Local Development](local-development.md) for the practical
+`just`-recipe-driven dev loop, and [CI Architecture](../design/ci-architecture.md)
+for the design rationale behind the build system (caching strategy,
+per-workflow scoping, why we chose `just` over `make`).
+
 ## Repo layout for contributors
 
 ```

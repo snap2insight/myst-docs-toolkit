@@ -40,9 +40,11 @@ project:
         - file: design/vendoring-modes.md
         - file: design/version-pinning.md
         - file: design/design-decisions.md
+        - file: design/ci-architecture.md
 
     - title: "Contributing"
       children:
         - file: contributing/overview.md
+        - file: contributing/local-development.md
         - file: contributing/adding-plugins.md
         - file: contributing/releases.md

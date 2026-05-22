@@ -62,8 +62,15 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - uses: extractions/setup-just@v3
 
-      - name: Add npm-global bin to PATH
-        run: echo "$NPM_CONFIG_PREFIX/bin" >> "$GITHUB_PATH"
+      - name: Configure npm prefix + PATH
+        # setup-node@v5 writes an .npmrc that overrides our NPM_CONFIG_PREFIX
+        # env var, causing `npm install -g` to ignore it and write to
+        # /usr/local/ instead. Forcibly set the prefix here so installs +
+        # cache restores target the same directory.
+        run: |
+          mkdir -p "$NPM_CONFIG_PREFIX/bin"
+          npm config set prefix "$NPM_CONFIG_PREFIX"
+          echo "$NPM_CONFIG_PREFIX/bin" >> "$GITHUB_PATH"
 
       # ── Caches ───────────────────────────────────────────────────────
       # Three caches, scoped by what invalidates them:
@@ -88,9 +95,13 @@ jobs:
           path: |
             /home/runner/.npm-global
             /home/runner/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('Justfile') }}
+          # v2 suffix bypasses any cache saved before the
+          # `npm config set prefix` fix — old caches had npm install
+          # writing to /usr/local/ (default), so the saved
+          # /home/runner/.npm-global/ was empty.
+          key: ${{ runner.os }}-npm-v2-${{ hashFiles('Justfile') }}
           restore-keys: |
-            ${{ runner.os }}-npm-
+            ${{ runner.os }}-npm-v2-
 
       - name: Cache book-theme submodule (working tree + git state)
         id: submodule-cache

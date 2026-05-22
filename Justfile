@@ -30,10 +30,12 @@ setup: venv python-deps node-deps
     @echo ""
     @echo "✅ Setup complete. Try: just docs-dev"
 
-# Create a uv-managed Python virtualenv at .venv/.
+# Create a uv-managed Python virtualenv at .venv/. Idempotent — no-op
+# if the venv already exists (other recipes may declare this as a prereq
+# multiple times within the same `just` invocation).
 venv:
     @command -v uv >/dev/null || { echo "❌ Install uv first: curl -LsSf https://astral.sh/uv/install.sh | sh"; exit 1; }
-    uv venv {{venv}}
+    @test -d {{venv}} || uv venv {{venv}}
 
 # Install Python dependencies from requirements.txt into the venv.
 python-deps: venv
@@ -92,15 +94,18 @@ test: test-python test-mmdc
 test-python: python-deps
     {{pytest}} plugins/myst-mermaid/tests/test_plugin.py -v
 
-# mermaid-cli integration tests — installs mmdc + chrome if needed.
-test-mmdc: python-deps
+# Ensure mmdc + matching Chrome are installed (idempotent helper).
+_install-mmdc:
     @command -v mmdc >/dev/null || npm install -g @mermaid-js/mermaid-cli
     @MMDC_DIR="$(npm root -g)/@mermaid-js/mermaid-cli" && \
      (cd "$MMDC_DIR" && npx --yes puppeteer browsers install chrome-headless-shell --quiet) || true
+
+# mermaid-cli integration tests.
+test-mmdc: python-deps _install-mmdc
     {{pytest}} plugins/myst-mermaid/tests/test_mermaid_cli.py -v
 
 # Smoke-test that mmdc renders a trivial graph cleanly.
-test-mmdc-smoke:
+test-mmdc-smoke: _install-mmdc
     @echo "graph LR; A --> B" > /tmp/smoke.mmd
     mmdc -i /tmp/smoke.mmd -o /tmp/smoke.svg \
          -p plugins/myst-mermaid/tests/puppeteer-config.json \

@@ -92,11 +92,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      - name: Cache book-theme submodule
+      - name: Cache book-theme submodule (working tree + git state)
         id: submodule-cache
         uses: actions/cache@v4
         with:
-          path: templates/book-theme
+          # Cache BOTH the working tree and the .git/modules directory.
+          # If we only cached the working tree, the post-checkout cleanup
+          # in actions/checkout would emit a "fatal: not a git repository"
+          # warning when it tries to `git submodule foreach` on a tree
+          # whose submodule git state was never initialized.
+          path: |
+            templates/book-theme
+            .git/modules/templates/book-theme
           key: ${{ runner.os }}-book-theme-${{ hashFiles('.gitmodules', '.toolkit-version') }}
           restore-keys: |
             ${{ runner.os }}-book-theme-

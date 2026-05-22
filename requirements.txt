@@ -10,3 +10,6 @@ jsonschema
 
 # Plugin tests
 pytest
+# Parallel test execution (4 mermaid-cli integration tests each spin up
+# their own Chrome; -n auto cuts wall-clock ~3-4× on the CI runner).
+pytest-xdist

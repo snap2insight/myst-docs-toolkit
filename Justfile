@@ -91,6 +91,7 @@ sync target:
 test: test-python test-mmdc
 
 # Python unit tests for the myst-mermaid plugin.
+# Not parallelized — small suite, parallel-worker startup would be net slower.
 test-python: python-deps
     {{pytest}} plugins/myst-mermaid/tests/test_plugin.py -v
 
@@ -100,9 +101,12 @@ _install-mmdc:
     @MMDC_DIR="$(npm root -g)/@mermaid-js/mermaid-cli" && \
      (cd "$MMDC_DIR" && npx --yes puppeteer browsers install chrome-headless-shell --quiet) || true
 
-# mermaid-cli integration tests.
+# mermaid-cli integration tests. Parallelized via pytest-xdist (`-n auto`):
+# each test spins up its own Chrome via mmdc, so running them in parallel
+# scales linearly with CPU cores (4 tests × ~5-7s each, ~7s wall-clock on
+# a 4-core runner).
 test-mmdc: python-deps _install-mmdc
-    {{pytest}} plugins/myst-mermaid/tests/test_mermaid_cli.py -v
+    {{pytest}} plugins/myst-mermaid/tests/test_mermaid_cli.py -v -n auto
 
 # Smoke-test that mmdc renders a trivial graph cleanly.
 test-mmdc-smoke: _install-mmdc

@@ -95,13 +95,15 @@ jobs:
           path: |
             /home/runner/.npm-global
             /home/runner/.npm
-          # v2 suffix bypasses any cache saved before the
-          # `npm config set prefix` fix — old caches had npm install
-          # writing to /usr/local/ (default), so the saved
-          # /home/runner/.npm-global/ was empty.
-          key: ${{ runner.os }}-npm-v2-${{ hashFiles('Justfile') }}
+          # Scoped per-workflow ("docs") because ci.yml installs different
+          # global packages (mmdc, not mystmd). Sharing a single key
+          # produces a `Failed to save: Unable to reserve cache with
+          # key … another job may be creating this cache` collision when
+          # both workflows run on the same push, leaving one workflow
+          # with a partial cache from the other workflow's job.
+          key: ${{ runner.os }}-npm-docs-${{ hashFiles('Justfile') }}
           restore-keys: |
-            ${{ runner.os }}-npm-v2-
+            ${{ runner.os }}-npm-docs-
 
       - name: Cache book-theme submodule (working tree + git state)
         id: submodule-cache

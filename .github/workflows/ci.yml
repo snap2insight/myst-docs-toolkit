@@ -107,13 +107,15 @@ jobs:
           path: |
             /home/runner/.npm-global
             /home/runner/.npm
-          # v2 suffix bypasses any cache saved before the
-          # `npm config set prefix` fix — old caches had npm install
-          # writing to /usr/local/ (default), so the saved
-          # /home/runner/.npm-global/ was empty.
-          key: ${{ runner.os }}-npm-v2-${{ hashFiles('Justfile') }}
+          # Scoped per-workflow ("ci") because docs.yml installs different
+          # global packages (mystmd, not mmdc). Sharing a single key
+          # produces a `Failed to save: Unable to reserve cache with
+          # key … another job may be creating this cache` collision when
+          # both workflows run on the same push, leaving one workflow
+          # with a partial cache from the other workflow's job.
+          key: ${{ runner.os }}-npm-ci-${{ hashFiles('Justfile') }}
           restore-keys: |
-            ${{ runner.os }}-npm-v2-
+            ${{ runner.os }}-npm-ci-
 
       - name: Cache puppeteer Chrome
         uses: actions/cache@v4

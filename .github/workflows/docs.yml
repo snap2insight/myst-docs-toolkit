@@ -37,6 +37,9 @@ env:
   # Opt JS actions into Node 24 (configure-pages@v5 still declares Node 20).
   # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  # Install npm globals into a path we can cache (default /usr/local is
+  # shared and not safe to cache wholesale).
+  NPM_CONFIG_PREFIX: /home/runner/.npm-global
 
 jobs:
   build:
@@ -45,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          submodules: true            # fetch book-theme submodule
+          submodules: false           # restored from cache below; see "Cache submodule"
           fetch-depth: 0              # update-dates.py needs full history
 
       - uses: actions/setup-node@v5
@@ -59,9 +62,54 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - uses: extractions/setup-just@v3
 
+      - name: Add npm-global bin to PATH
+        run: echo "$NPM_CONFIG_PREFIX/bin" >> "$GITHUB_PATH"
+
+      # ── Caches ───────────────────────────────────────────────────────
+      # Three caches, scoped by what invalidates them:
+      #   1) Python venv      — invalidated by requirements.txt
+      #   2) npm globals + tarballs — invalidated by Justfile (where
+      #      `npm install -g mystmd` etc. live; pin versions there if/when
+      #      we want stricter cache hits)
+      #   3) book-theme submodule — invalidated by .gitmodules or
+      #      .toolkit-version
+
+      - name: Cache Python venv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-venv-
+
+      - name: Cache npm globals + tarball cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /home/runner/.npm-global
+            /home/runner/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('Justfile') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Cache book-theme submodule
+        id: submodule-cache
+        uses: actions/cache@v4
+        with:
+          path: templates/book-theme
+          key: ${{ runner.os }}-book-theme-${{ hashFiles('.gitmodules', '.toolkit-version') }}
+          restore-keys: |
+            ${{ runner.os }}-book-theme-
+
+      - name: Init submodule (cache miss)
+        if: steps.submodule-cache.outputs.cache-hit != 'true'
+        run: git submodule update --init --depth 1 --recursive
+
+      # ── Install (no-ops on full cache hit) ───────────────────────────
       - name: Install build deps
         run: just node-deps python-deps
 
+      # ── Build + deploy ───────────────────────────────────────────────
       - name: Resolve BASE_URL from the Pages serving URL
         id: base
         env:

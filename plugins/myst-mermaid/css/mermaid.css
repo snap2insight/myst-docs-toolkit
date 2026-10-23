@@ -84,3 +84,53 @@ html.dark, html[data-theme="dark"] {
 [class*="mermaid"] svg * {
     font-family: var(--mermaid-font-family) !important;
 }
+
+
+/* ---------- Sizing in the same font ----------
+ * Mermaid sizes every box from the font it is CONFIGURED with, before
+ * this override applies. So the site's myst-mermaid.yml must name the
+ * same font — `fontFamily`, `themeVariables.fontFamily` and, for sequence
+ * diagrams, `sequence.actorFontFamily` / `noteFontFamily` /
+ * `messageFontFamily` — or labels outgrow their boxes.
+ *
+ * Nothing else on a page uses that font, so the browser would fetch it
+ * only when the first diagram is being measured — and size that diagram
+ * with a fallback. One hidden glyph makes it load with the page. */
+
+body::after {
+    content: "Aa";
+    content: "Aa" / "";
+    font-family: var(--mermaid-font-family);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* If a label was still sized with a fallback, it spills a few pixels
+ * past its box instead of being cut off. */
+[class*="mermaid"] svg foreignObject {
+    overflow: visible;
+}
+
+
+/* ---------- Wide diagrams scroll ----------
+ * Mermaid's default (`useMaxWidth: true` per diagram type) scales a
+ * diagram down to the column, so a wide one ends up with unreadable text.
+ * A site that sets `useMaxWidth: false` gets diagrams at their natural
+ * size; these rules give each a scroll box, so one wider than the column
+ * scrolls sideways like a wide code block instead of overflowing the
+ * page, and centre the narrower ones. With the default they do nothing:
+ * a diagram drawn at 100 % width never overflows. */
+
+[class*="mermaid"] figure > div:has(> svg) {
+    overflow-x: auto;
+}
+
+[class*="mermaid"] figure > div > svg {
+    margin-inline: auto;
+}

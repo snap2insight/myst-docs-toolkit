@@ -103,6 +103,21 @@ color-palette CSS variables, and a `.mermaid text` font override live at
 the toolkit's `css/site.css`**, so consumers who use the toolkit's
 generic stylesheet get the mermaid styling for free.
 
+Mermaid sizes each box from the font in its **config**, then the CSS
+override draws the text: name the same font in `myst-mermaid.yml`
+(`fontFamily`, `themeVariables.fontFamily`, and the three
+`sequence.*FontFamily` keys), or labels outgrow their boxes and are cut
+off. The CSS also loads that font with the page, so the first diagram is
+not measured with a fallback.
+
+Wide diagrams: by default Mermaid shrinks each diagram to the column, so a
+wide one's text becomes unreadable. Set `useMaxWidth: false` under each
+diagram type you use (`flowchart`, `sequence`, `er`, `state`, `class`,
+`mindmap`, …) to draw them at natural size; the CSS puts each in a box
+that scrolls sideways when it is wider than the column. A `gantt` chart
+takes the width it is drawn in (the window), so also pin it with
+`gantt.useWidth` (the column's width).
+
 If your site only wants the mermaid plugin's CSS (without the toolkit's
 generic block-kind / button / footer rules), point your
 `shared-theme.yml` at this file instead of `css/site.css`:

@@ -155,7 +155,14 @@ function openFullscreen(source) {
   });
 
   // --- Cleanup 4: Size SVGs and images for the fullscreen viewport. ---
+  // Only the figure's own content is resized. SVG icons in the caption
+  // (e.g. the theme's download / external-link icon) and SVGs nested inside
+  // another SVG keep their own size; without this a 1em caption icon is
+  // blown up to 90vw.
+  const isContent = (el) =>
+    !el.closest('figcaption') && !el.parentElement?.closest('svg');
   clone.querySelectorAll('svg').forEach(svg => {
+    if (!isContent(svg)) return;
     // Mermaid sets width="100%" / height="100%" so the SVG fills its
     // inline parent. In the dialog the parent has no fixed size, so
     // the SVG would collapse to 0×0. Remove percentage dimensions and
@@ -174,6 +181,7 @@ function openFullscreen(source) {
 
   // Handle <img> elements inside <figure> clones.
   clone.querySelectorAll('img').forEach(img => {
+    if (!isContent(img)) return;
     img.style.maxWidth = 'min(90vw, 1400px)';
     img.style.maxHeight = '88vh';
     img.style.height = 'auto';
@@ -396,11 +404,15 @@ function injectStyles() {
       max-width: 90vw;
       max-height: 88vh;
     }
-    .mfv-dialog-stage svg {
+    .mfv-dialog-stage svg:not(figcaption svg, svg svg) {
       width: auto;
       height: auto;
       max-width: 90vw;
       max-height: 88vh;
+    }
+    .mfv-dialog-stage figcaption {
+      max-width: min(90vw, 1400px);
+      margin: 0.75rem auto 0;
     }
   `;
   document.head.appendChild(style);
